@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '/screens_3/home_screen.dart';
 import '/screens_3/starter_project.dart';
-
-
+import '/screens_3/home_screen.dart';
 
 class WelcomeScreen extends StatelessWidget{
    WelcomeScreen({super.key});
 
-  // String name = "";
   final TextEditingController controller = TextEditingController();
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
 

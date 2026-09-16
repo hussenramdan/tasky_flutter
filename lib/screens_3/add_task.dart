@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/task_model.dart';
 
 class AddTask extends StatefulWidget {
   const AddTask({super.key});
@@ -141,21 +146,40 @@ class _AddTaskState extends State<AddTask> {
                       foregroundColor: const Color(0xFFFFFCFC),
                       fixedSize: Size(MediaQuery.of(context).size.width, 40),
                     ),
-                    onPressed: () {
+                    onPressed: () async{
                       if (_key.currentState!.validate() ?? false ) {
 
-                        <String, dynamic>{
-                          "taskName": taskNameController.text,
-                          "taskDescription": taskDescriptionController.text,
-                          "isHighPriority": isHighPriority,
-                        };
+                        TaskModel model = TaskModel(
+                          taskName: taskNameController.text,
+                          taskDescription: taskDescriptionController.text,
+                          isHighPriority: isHighPriority,
+                        );
+
+
+                        // final task = <String, dynamic>{
+                        //   "taskName": taskNameController.text,
+                        //   "taskDescription": taskDescriptionController.text,
+                        //   "isHighPriority": isHighPriority,
+                        // };
+
+                        final pref = await SharedPreferences.getInstance();
+
+                        final taskJson = pref.getString('tasks');
+                        List<dynamic> listTask = [];
+
+                        if(taskJson != null ){
+                          listTask = jsonDecode(taskJson);
+                        }
+                        listTask.add(model.toMap());
+                        final taskEncode = jsonEncode(listTask);
+                        await pref.setString("tasks", taskEncode);
+
                       }
                     },
                     label: const Text("Add Task"),
                     icon: const Icon(Icons.add),
                   )
                 ],
-
             ),
           ),
         ),

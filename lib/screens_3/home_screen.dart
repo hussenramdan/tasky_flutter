@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/task_model.dart';
 import '/screens_3/add_task.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,22 +14,36 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? username = "Default";
+  List<TaskModel> task = [];
 
   @override
   void initState() {
     super.initState();
 
     _loadUserName();
+    _loadTask();
   }
 
   void _loadUserName() async {
     final pref = await SharedPreferences.getInstance();
-
     setState(() {
       username = pref.getString('username');
     });
-
     print("username = $username");
+   }
+
+
+  void _loadTask() async{
+    final pref = await SharedPreferences.getInstance();
+    final finalTask = pref.getString("tasks");
+
+    if(finalTask != null ){
+      final taskAfterDecode = jsonDecode(finalTask ?? "") as List<dynamic> ;
+
+      setState(() {
+        task =  taskAfterDecode.map((element) => TaskModel.formJson(element)).toList();
+      });
+    }
   }
 
   @override
@@ -115,7 +132,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 32,
                   ),
                 ],
-              )
+              ),
+
+              if (task.isNotEmpty)
+                Column(
+                  children: [
+                    Text (task[0].taskName,
+                        style: TextStyle(color: Colors.white),),
+                    Text (task[0].taskDescription,
+                        style: TextStyle(color: Colors.white),),
+                    Text (task[0].isHighPriority.toString(),
+                        style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+
             ],
           ),
         ),
@@ -123,30 +154,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-
-
-// Spacer(),
-// Align(
-//   alignment: Alignment.bottomRight,
-//   child: ElevatedButton.icon(
-//     style: ElevatedButton.styleFrom(
-//       backgroundColor: Color(0xFF15886C),
-//
-//       foregroundColor: Color(0xFFFFFCFC),
-//       fixedSize: Size(168, 48),
-//     ),
-//     icon: Icon(Icons.add),
-//     label: Text("Add New Task"),
-//     onPressed: () {
-//       Navigator.push(
-//         context,
-//         MaterialPageRoute(
-//           builder: (BuildContext context) {
-//             return AddTask();
-//           },
-//         ),
-//       );
-//     },
-//   ),
-// ),
